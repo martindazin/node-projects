@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Chantango-like</title>
+        <style>
+
+            
+
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font: 13px Helvetica, Arial; }
+            form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+            form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+            form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+            #messages { list-style-type: none; margin: 0; padding: 0; }
+            #messages li { padding: 5px 10px; }
+            #messages li:nth-child(odd) { background: #eee; }
+        </style>
+
+        <!--
+           #chatzone strong {
+                color: white;
+                background-color: black;
+                padding: 2px;
+            } 
+        -->
+
+
+        <!--
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font: 13px Helvetica, Arial; }
+            form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+            form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+            form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+            #messages { list-style-type: none; margin: 0; padding: 0; }
+            #messages li { padding: 5px 10px; }
+            #messages li:nth-child(odd) { background: #eee; }
+        -->
+
+    </head>
+ 
+    <body>
+        <h1>Chantango-like</h1>
+
+        <!-- 
+            <section id="chatzone"></section>
+        -->
+
+        <ul id="chatzone"></ul>
+
+        <form action="/" method="post" id="formulaire_chat">
+            <input type="text" name="msg" id="msg" placeholder="Type your message..." size="50" autofocus />
+            <!-- <input type="submit" id="envoi_message" value="Envoyer" /> -->
+            <button type="submit" id="envoi_message" value="Envoyer">Send</button>
+        </form>
+
+        <!--
+            
+            <form action="">
+                <input id="m" autocomplete="off" /><button>Send</button>
+            </form>
+        -->
+
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+
+            // Connexion to socket.io
+            var socket = io.connect('http://localhost:8080');
+
+            // Asking nickname, sends it to the server and displays in title
+            var nickname = prompt('What is your nickname ?');
+            socket.emit('new_user', nickname);
+            document.title = nickname + ' - ' + document.title;
+
+            // When it receives a msg, it inserts it in the page 
+            socket.on('msg', function(data) {
+                insereMessage(data.nickname, data.msg)
+            })
+
+            // When a new user connects, it displays the info
+            socket.on('new_user', function(nickname) {
+                $('#chatzone').append('<p><em>' + nickname + ' joins the Chatango-like !</em></p>');
+            })
+
+            // When we send a form, it broadcasts the msg and it displays on the page
+            $('#formulaire_chat').submit(function () {
+                var msg = $('#msg').val();
+                // Broadcasts the msg for the others
+                socket.emit('msg', msg);
+                // Displays also the msg on our page
+                insereMessage(nickname, msg);
+                // It empty the chatzone and returns the focus
+                $('#msg').val('').focus();
+                // Permits to block the 'classical' sending of the form
+                return false;
+            });
+
+            /*
+            socket.on('chat message', function(msg){
+                $('#chatzone').append($('<li>').text(msg));
+            });
+            */
+            
+            // Adds a msg in the page
+            function insereMessage(nickname, msg) {
+                
+                var date = new Date();
+                var hjs = date.toLocaleTimeString();
+                var dmy = date.toLocaleDateString();
+                var now = hjs + ' ' + dmy;
+
+
+                $('#chatzone').append('<p><strong>' + nickname + ' (' + now + ') :</strong> ' + msg + '</p>');
+            }
+        </script>
+    </body>
+</html>

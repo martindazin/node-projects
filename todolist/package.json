@@ -1,0 +1,12 @@
+{
+    "name": "todolist",
+    "version": "0.1.0",
+    "dependencies": {
+        "express": "~4.14.0",
+        "ejs": "~2.5.2",
+        "cookie-session": "~2.0.0-alpha.2",
+        "body-parser": "~1.15.2"
+    },
+    "author": "Mart49 <mart.49@hotmail.fr>",
+    "description": "Gestionnaire de TODO list d'OpenClassrooms"
+}
